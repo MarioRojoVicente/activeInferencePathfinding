@@ -12,11 +12,13 @@ class DFS(): #LIFO
             self.visited = Set() #unordered set
 
     def search(self):
+        t = 0
         while not len(self.frontier)==0:
             curentState = self.frontier[-1]
             self.frontier = self.frontier[0:-1]
             self.visited.add(curentState)
             if curentState.equals(self.goal.getState()):
+                print("Depth First Search did", t, "iterations.")
                 return curentState
             else:
                 children = self.getChildren(curentState)
@@ -25,6 +27,7 @@ class DFS(): #LIFO
                         #print("Not Visited")
                         self.frontier.append(child)
                     #print("Visited")
+            t += 1
 
         raise Exception ("Frontier is empty. Path was not found.")
             

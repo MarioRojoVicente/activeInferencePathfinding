@@ -6,7 +6,9 @@ from aStar import *
 from maps import *
 from heuristics import *
 from activeInferenceDecisionMaking import ActiveInference
+from activeInferencePlanning import ActiveInferenceV2
 import time
+import numpy as np
 
 map = MAP1
 
@@ -63,24 +65,38 @@ start_time_act_inf = time.time()
 
 agent = ActiveInference(initialState, goalState, heuristic)
 
+start_time_act_inf_search = time.time()
+
 path = agent.generatePlan()
+
+end_time_act_inf_search = time.time()
 
 end_time_act_inf = time.time()
 
-print("Path of length", len(path), "found with Active Inference with a time of", end_time_act_inf - start_time_act_inf)
+print("Path of length", len(path), "found with Active Inference with a time of", end_time_act_inf - start_time_act_inf, "the search lasted",end_time_act_inf_search - start_time_act_inf_search)
 
 #print("The path is ", path)
+#for elem in path:
+#    print(np.array(elem.getState()))
+#    time.sleep(2)
+
 #print(end_time_a_star - start_time_a_star , "VS", end_time_act_inf - start_time_act_inf)
 
 ###################################################
 
-#start_time_act_inf = time.time()
+start_time_act_inf = time.time()
 
-#path = agent.generatePlan()
+agent = ActiveInferenceV2(initialState, goalState, heuristic)
 
-#end_time_act_inf = time.time()
+start_time_act_inf_search = time.time()
 
-#print("Path of length", len(path), "found with Active Inference with a time of", end_time_act_inf - start_time_act_inf)
+path = agent.generatePlan()
+
+end_time_act_inf_search = time.time()
+
+end_time_act_inf = time.time()
+
+print("Path of length", path.getPathLen(), "found with Active Inference V2 with a time of", end_time_act_inf - start_time_act_inf, "the search lasted",end_time_act_inf_search - start_time_act_inf_search)
 #print("The path is ", path)
 #print(end_time_a_star - start_time_a_star , "VS", end_time_act_inf - start_time_act_inf)
 

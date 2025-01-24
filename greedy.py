@@ -12,10 +12,12 @@ class Greedy():
         self.visited = Set() #unordered set
 
     def search(self):
+        t = 0
         while not self.frontier.isEmpty():
             curentState = self.frontier.retrieve()
             self.visited.add(curentState)
             if curentState.equals(self.goal.getState()):
+                print("Greedy did", t, "iterations.")
                 return curentState
             else:
                 children = self.getChildren(curentState)
@@ -24,6 +26,7 @@ class Greedy():
                         #print("Not Visited")
                         self.frontier.add(child, self.evaluate(child))
                     #print("Visited")
+            t += 1
 
         raise Exception ("Frontier is empty. Path was not found.")
             

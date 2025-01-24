@@ -166,34 +166,60 @@ class ActiveInferenceV2:
         frontier = [State(self.statesList[np.argmax(currentStateDistribution)].getState(), None)]
         frontierValues = [self.cVectors[0]]
         frontierStateDistribution = [currentStateDistribution]
+        visited = []
         
-        lastState, masterDistribution = self.getBestFromFrontier(frontier, frontierValues, frontierStateDistribution)
+        lastState, lastStateValue, masterDistribution = self.getBestFromFrontier(frontier, frontierValues, frontierStateDistribution)
+        visited.append(lastState)
+
+        #print(np.array(lastState.getState()))
+        #print(len(frontier))
+        #print("·······································")
 
         while not lastState.equals(self.goal.getState()):
             #print(self.gVectors[np.argmax(currentStateDistribution)])
             #for pi in range(len(self.gVectors[np.argmax(currentStateDistribution)])):
             #print(self.gVectors)
             self.updateCVectors(np.argmax(currentStateDistribution))
-            for idx in range(len(self.gVectors)):
-                bestPlan = np.argmin(self.gVectors)
-                
-                currentStateDistribution = np.matmul(masterDistribution, self.bMatrix[bestPlan])
-                frontier.append(Move(list(DIRECTIONS.keys())[bestPlan].result,2,lastState))
-                frontierValues.append(self.gVectors[bestPlan] + frontier[-1].getPathLen())
-                frontierStateDistribution.append(currentStateDistribution)
-                self.gVectors[bestPlan] = 1000
-                #time.sleep(3)
+            for bestPlan in range(len(self.gVectors)):
+                move = Move(list(DIRECTIONS.keys())[bestPlan],2,lastState).result
+                if move != -1:
+                    isInVisited = False
+                    for elem in visited:
+                        if elem.equals(move.getState()):
+                            isInVisited = True
+                            break
+                    if not isInVisited:
+                        currentStateDistribution = np.matmul(masterDistribution, self.bMatrix[bestPlan])
+                        frontier.append(move)
+                        #print("AAAAAAAAAAAA", frontier[-1])
+                        frontierValues.append(self.gVectors[bestPlan] + move.getPathLen())
+                        frontierStateDistribution.append(currentStateDistribution)
+                #self.gVectors[bestPlan] = 1000
                 #print(DIRECTIONS.keys())
                 #print(self.cVectors[np.argmax(currentStateDistribution)])
-            lastState, masterDistribution = self.getBestFromFrontier(frontier, frontierValues)
-                
+            lastState, lastStateValue, masterDistribution = self.getBestFromFrontier(frontier, frontierValues, frontierStateDistribution)
+            self.generateGVectors(masterDistribution)
+            #print(np.array(lastState.getState()))
+            #print("Frontier", len(frontier))
+            #print("Visited", len(visited))
+            #print(lastStateValue)
+            #print("·······································")
+            #time.sleep(3)
+            visited.append(lastState)
+            t += 1
+        
+        print("Active Inference did V2", t, "iterations.")
         return lastState
     
     def getBestFromFrontier(self, frontier, frontierValues, frontierStateDistribution):
-        idx = np.argmax(frontierValues)[0]
+        
+        #print(len(frontierValues))
+        #print(len(frontierStateDistribution))
+        idx = np.argmin(frontierValues)
         lastState = frontier[idx]
+        lastStateValue = frontierValues[idx]
         masterDistribution = frontierStateDistribution[idx]
-        del frontier[idx]
-        del frontierValues[idx]
-        del frontierStateDistribution[idx]
-        return lastState, masterDistribution
+        frontier.pop(idx)
+        frontierValues.pop(idx)
+        frontierStateDistribution.pop(idx)
+        return lastState, lastStateValue, masterDistribution

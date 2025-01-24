@@ -180,4 +180,7 @@ class ActiveInference:
             #print(DIRECTIONS.keys())
             path.append(self.statesList[np.argmax(currentStateDistribution)])
             self.generateGVectors(currentStateDistribution)
+            t += 1
+        
+        print("Active Inference did", t, "iterations.")
         return path
