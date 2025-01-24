@@ -75,21 +75,33 @@ class OrderedSet():
 
     def add(self, key: State, value: int):
         if not self.checkElement(key):
+            #print("Element not in set")
             idx = 0
             while idx < len(self.values) and self.values[idx] <= value:
                 idx = idx + 1
-            new_keys = self.keys[0:idx]
-            new_keys.append(key)
-            for elem in self.keys[idx+1:]:
-                new_keys.append(elem) 
+            if idx > 0:
+                new_keys = self.keys[0:idx]
+                new_keys.append(key)
+                for elem in self.keys[idx+1:]:
+                    new_keys.append(elem)
+            else:
+                new_keys = [key] + self.keys
+                
             self.keys = new_keys
 
-            new_vals = self.values[0:idx]
-            new_vals.append(value)
-            for elem in self.values[idx+1:]:
-                new_vals.append(elem)  
+            if idx > 0:
+                new_vals = self.values[0:idx]
+                new_vals.append(value)
+                for elem in self.values[idx+1:]:
+                    new_vals.append(elem)
+            else:
+                new_vals = [value] + self.values
+
             self.values = new_vals
+            #print(len(self.values) == len(self.keys))
+            
         else:
+            #print("Element in set")
             idx = self.getIndex(key)
             if (self.values[idx] > value):
                 self.values.pop(idx)
