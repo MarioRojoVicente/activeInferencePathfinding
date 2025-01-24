@@ -11,7 +11,7 @@ import time
 #Q refers to the aproximate postirior, meaning the expected observation on a time grater than the current
 
 ####################
-class ActiveInference:
+class ActiveInferenceV2:
 
     h = None #heuristic
     goal = None #goal state
@@ -158,26 +158,42 @@ class ActiveInference:
     def generatePlan(self):
 
         path = []
+        
 
         t = 0
         currentStateDistribution = self.dVectors
+
+        frontier = [State(self.statesList[np.argmax(currentStateDistribution)].getState(), None)]
+        frontierValues = [self.cVectors[0]]
+        frontierStateDistribution = [currentStateDistribution]
         
-        while not self.statesList[np.argmax(np.matmul(currentStateDistribution, self.aMatrix))].equals(self.goal.getState()):
+        lastState, masterDistribution = self.getBestFromFrontier(frontier, frontierValues, frontierStateDistribution)
+
+        while not lastState.equals(self.goal.getState()):
             #print(self.gVectors[np.argmax(currentStateDistribution)])
             #for pi in range(len(self.gVectors[np.argmax(currentStateDistribution)])):
             #print(self.gVectors)
             self.updateCVectors(np.argmax(currentStateDistribution))
-            bestPlan = np.argmin(self.gVectors)
-            #self.gVectors[np.argmax(currentStateDistribution)][bestPlan] += 1
-            #if self.gVectors[np.argmax(currentStateDistribution)][bestPlan] + 100 < 10000:
-            #    self.gVectors[np.argmax(currentStateDistribution)][bestPlan] += 100
-            #else:
-            #    self.gVectors[np.argmax(currentStateDistribution)][bestPlan] = 9999
-            #self.gVectors[np.argmax(currentStateDistribution)] = softmax(self.gVectors[np.argmax(currentStateDistribution)])
-            #print(np.array(self.statesList[np.argmax(np.matmul(currentStateDistribution, self.aMatrix))].getState()))
-            currentStateDistribution = np.matmul(currentStateDistribution, self.bMatrix[bestPlan])
-            #time.sleep(3)
-            #print(DIRECTIONS.keys())
-            path.append(list(DIRECTIONS.keys())[bestPlan])
-            self.generateGVectors(currentStateDistribution)
-        return path
+            for idx in range(len(self.gVectors)):
+                bestPlan = np.argmin(self.gVectors)
+                
+                currentStateDistribution = np.matmul(masterDistribution, self.bMatrix[bestPlan])
+                frontier.append(Move(list(DIRECTIONS.keys())[bestPlan].result,2,lastState))
+                frontierValues.append(self.gVectors[bestPlan] + frontier[-1].getPathLen())
+                frontierStateDistribution.append(currentStateDistribution)
+                self.gVectors[bestPlan] = 1000
+                #time.sleep(3)
+                #print(DIRECTIONS.keys())
+                #print(self.cVectors[np.argmax(currentStateDistribution)])
+            lastState, masterDistribution = self.getBestFromFrontier(frontier, frontierValues)
+                
+        return lastState
+    
+    def getBestFromFrontier(self, frontier, frontierValues, frontierStateDistribution):
+        idx = np.argmax(frontierValues)[0]
+        lastState = frontier[idx]
+        masterDistribution = frontierStateDistribution[idx]
+        del frontier[idx]
+        del frontierValues[idx]
+        del frontierStateDistribution[idx]
+        return lastState, masterDistribution

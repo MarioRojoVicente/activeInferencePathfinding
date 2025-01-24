@@ -178,6 +178,6 @@ class ActiveInference:
             currentStateDistribution = np.matmul(currentStateDistribution, self.bMatrix[bestPlan])
             #time.sleep(3)
             #print(DIRECTIONS.keys())
-            path.append(list(DIRECTIONS.keys())[bestPlan])
+            path.append(self.statesList[np.argmax(currentStateDistribution)])
             self.generateGVectors(currentStateDistribution)
         return path

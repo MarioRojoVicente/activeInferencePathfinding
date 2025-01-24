@@ -5,10 +5,10 @@ from state import *
 from aStar import *
 from maps import *
 from heuristics import *
-from activeInference import ActiveInference
+from activeInferenceDecisionMaking import ActiveInference
 import time
 
-map = MAP4
+map = MAP1
 
 initialState = State(map[0])
 
