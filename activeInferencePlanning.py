@@ -100,7 +100,7 @@ class ActiveInference:
         self.cVectors = np.transpose(self.cVectors)
 
     def generateCVectors(self):
-        self.cVectors = np.zeros(3,len(self.statesList))
+        self.cVectors = np.zeros(len(self.statesList))
         for elemidx in range(len(self.statesList)):
             self.cVectors[elemidx] = -self.evaluate(self.statesList[elemidx])
         
@@ -108,11 +108,8 @@ class ActiveInference:
         #self.cVectors = softmax(self.cVectors)
         self.cVectors = np.transpose(self.cVectors)
     
-    def updateCVectorsVisited(self, visitedStateIdx):
-        self.cVectors[visitedStateIdx][2] = 1
-
-    def updateCVectorsFrontier(self, children):
-        pass
+    def updateCVectors(self, visitedStateIdx):
+        self.cVectors[visitedStateIdx] = -len(self.statesList)
 
     def generateDVectors(self):
         #the D- vectors specify the prior probabilities for the initial states. The order of elements in  these vectors matches  those of the B-matrices.
@@ -164,13 +161,23 @@ class ActiveInference:
 
         t = 0
         currentStateDistribution = self.dVectors
-        self.updateCVectorsFrontier(np.argmax(currentStateDistribution))
-
+        
         while not self.statesList[np.argmax(np.matmul(currentStateDistribution, self.aMatrix))].equals(self.goal.getState()):
-            self.updateCVectorsVisited(np.argmax(currentStateDistribution))
-            
+            #print(self.gVectors[np.argmax(currentStateDistribution)])
+            #for pi in range(len(self.gVectors[np.argmax(currentStateDistribution)])):
+            #print(self.gVectors)
+            self.updateCVectors(np.argmax(currentStateDistribution))
             bestPlan = np.argmin(self.gVectors)
+            #self.gVectors[np.argmax(currentStateDistribution)][bestPlan] += 1
+            #if self.gVectors[np.argmax(currentStateDistribution)][bestPlan] + 100 < 10000:
+            #    self.gVectors[np.argmax(currentStateDistribution)][bestPlan] += 100
+            #else:
+            #    self.gVectors[np.argmax(currentStateDistribution)][bestPlan] = 9999
+            #self.gVectors[np.argmax(currentStateDistribution)] = softmax(self.gVectors[np.argmax(currentStateDistribution)])
+            #print(np.array(self.statesList[np.argmax(np.matmul(currentStateDistribution, self.aMatrix))].getState()))
             currentStateDistribution = np.matmul(currentStateDistribution, self.bMatrix[bestPlan])
+            #time.sleep(3)
+            #print(DIRECTIONS.keys())
             path.append(list(DIRECTIONS.keys())[bestPlan])
             self.generateGVectors(currentStateDistribution)
         return path
