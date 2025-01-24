@@ -8,7 +8,7 @@ from heuristics import *
 from activeInference import ActiveInference
 import time
 
-map = MAP1
+map = MAP4
 
 initialState = State(map[0])
 
@@ -61,11 +61,26 @@ print("Path of length", len(path)-1, "found with Greedy with a time of", end_tim
 start_time_act_inf = time.time()
 
 
-path = ActiveInference(initialState, goalState, heuristic).generatePlan()
+agent = ActiveInference(initialState, goalState, heuristic)
+
+path = agent.generatePlan()
 
 end_time_act_inf = time.time()
 
 print("Path of length", len(path), "found with Active Inference with a time of", end_time_act_inf - start_time_act_inf)
+
+#print("The path is ", path)
+#print(end_time_a_star - start_time_a_star , "VS", end_time_act_inf - start_time_act_inf)
+
+###################################################
+
+#start_time_act_inf = time.time()
+
+#path = agent.generatePlan()
+
+#end_time_act_inf = time.time()
+
+#print("Path of length", len(path), "found with Active Inference with a time of", end_time_act_inf - start_time_act_inf)
 #print("The path is ", path)
 #print(end_time_a_star - start_time_a_star , "VS", end_time_act_inf - start_time_act_inf)
 
