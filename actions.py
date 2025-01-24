@@ -19,7 +19,7 @@ class Move():
                 if map[row][col] == player:
                     playerIndex = [row, col]
 
-        if (self.moveIsValid(map, move, state.getPlayerPos(2))):
+        if (self.moveIsValid(map, move, playerIndex)):
             map[playerIndex[0]][playerIndex[1]] = 0
             map[playerIndex[0]+move[0]][playerIndex[1]+move[1]] = player
         
@@ -30,6 +30,7 @@ class Move():
 
     def moveIsValid(self, map, move, playerIndex):
         finalTile = map[playerIndex[0]+move[0]][playerIndex[1]+move[1]]
+        #print(playerIndex[0]+move[0], playerIndex[1]+move[1], finalTile)
         if finalTile == 1:#Tries to move to a wall
             return False
         else:
